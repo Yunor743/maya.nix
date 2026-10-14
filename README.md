@@ -1,8 +1,8 @@
 # maya.nix
 
-Run [Project Maya](https://github.com/mw00/project-maya) — the engine that serves
-**GLM-5.3-Flash** (a 321 B-parameter MoE, ~18 B active) on your own NVIDIA GPU(s) — as a native NixOS
-service, with an OpenAI- and Anthropic-compatible API on localhost. Ported from the same shape as
+Run [Project Maya](https://github.com/mw00/project-maya) as a native NixOS service, with an
+OpenAI- and Anthropic-compatible API on localhost. Its engine serves **GLM-5.3-Flash** (a
+321 B-parameter MoE, ~18 B active) on your own NVIDIA GPU(s). Ported from the same shape as
 [strata.nix](https://github.com/Yunor743/strata.nix).
 
 ```
@@ -49,8 +49,9 @@ service, with an OpenAI- and Anthropic-compatible API on localhost. Ported from 
 
 The service, on its first start:
 
-1. downloads the quant's shards and the vision files from Hugging Face — resumable, every file checked
-   against the sha256 upstream publishes for it, so an interrupted start continues where it left off;
+1. downloads the quant's shards and the vision files from Hugging Face. The download is resumable and
+   every file is checked against the sha256 upstream publishes for it, so an interrupted start
+   continues where it left off;
 2. builds the pack (the engine's index of the model files) inside the model folder with upstream's own
    builder (`tools/iq_pack.py --compat-bf16`), and copies the shipped expert profile;
 3. writes `/var/lib/maya/config.json` (engine arguments, tokenizer, API key if any, the vision block);
@@ -104,11 +105,11 @@ services.maya = {
 
 ## Packages
 
-- `maya` (= `maya-serve`) — the server bundle: `maya-serve`, `maya-chat` and `maya-prefetch` (the
+- `maya` (same as `maya-serve`): the server bundle, `maya-serve`, `maya-chat` and `maya-prefetch` (the
   download/prepare tool, usable standalone; `maya-prefetch --help`).
-- `maya-engine` — the CUDA inference binary, built from source
+- `maya-engine`: the CUDA inference binary, built from source
   (`maya-engine.override { cudaArch = "120"; }` for an RTX 50 card; default `89` = RTX 40).
-- `maya-vision` — the image encoder: llama.cpp's mtmd at the pinned commit with Maya's GLM-5.3-Flash
+- `maya-vision`: the image encoder, llama.cpp's mtmd at the pinned commit with Maya's GLM-5.3-Flash
   vision tower applied by `tools/vision/glm5next_patch.py`.
 - The model weights are **not** packaged: they are downloaded at runtime into the service's state
   directory (the nix store would not survive a 100 GB model well).
@@ -122,14 +123,14 @@ The build needs `git`: CMake applies `third_party/ggml/mmq-fused-swiglu.patch` t
 
 If Maya bumps its pin, evaluation fails with the new commit and an instruction to update the
 `llama-pinned` input. The flake input `maya` tracks upstream `main`. The lock file decides what you
-actually run — `nix flake lock --update-input maya` pulls new releases; audit what lands in it before doing so.
+actually run: `nix flake lock --update-input maya` pulls new releases; audit what lands in it before doing so.
 
 ## Testing
 
-- `nix flake check` — a serve smoke test (mock engine: HTTP endpoints without a GPU) and a NixOS VM test
+- `nix flake check`: a serve smoke test (mock engine, HTTP endpoints without a GPU) and a NixOS VM test
   of the systemd service with the mock engine.
-- `nix build .#maya-engine` — the real compile (20-40 minutes, once, cached after).
-- `nix build .#maya-vision` — the encoder build (llama.cpp's mtmd + ggml's CUDA kernels).
+- `nix build .#maya-engine`: the real compile (20-40 minutes, once, cached after).
+- `nix build .#maya-vision`: the encoder build (llama.cpp's mtmd + ggml's CUDA kernels).
 
 ## Notes for this port
 
@@ -143,7 +144,7 @@ actually run — `nix flake lock --update-input maya` pulls new releases; audit 
   revision upstream measured it on. It only pays off when most of the model is close, so measure it.
 - The engine pins nearly all free RAM for its expert tier; other services get little while Maya runs.
 - If the engine (or the vision encoder) logs `CUDA driver is a stub library`, something put the CUDA
-  toolkit's stub `libcuda.so.1` on the loader path ahead of the real driver - an inherited
+  toolkit's stub `libcuda.so.1` on the loader path ahead of the real driver. An inherited
   `LD_LIBRARY_PATH` is the usual culprit. The binaries' RUNPATH already starts with
   `/run/opengl-driver/lib`, so the systemd service is unaffected; clear `LD_LIBRARY_PATH`
   (or set it to `/run/opengl-driver/lib`) for manual runs.
