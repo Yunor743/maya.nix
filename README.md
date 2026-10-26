@@ -68,7 +68,7 @@ Chat and Monitor in the browser: `http://127.0.0.1:8080/`.
 | `enable` | `false` | Enable the service. |
 | `package` | `mayaPkgs.maya` | The maya-serve bundle (carries the engine and the encoder). |
 | `quant` | `Maya-S24` | `Maya-S-v2-IQ2_XXS` / `Maya-S24` / `Maya-M` / `Maya-M-Derisked` / `Maya-L`. |
-| `context` | `32768` | 8192–131072 tokens. The KV cache streams from RAM above the resident window. |
+| `context` | `32768` | 8192–1048576 tokens. The KV cache streams from RAM above the resident window. |
 | `host` / `port` | `127.0.0.1` / `8080` | Listen address. |
 | `apiKeyFile` | `null` | Path to a file with the API key (systemd credential). Required when `host` is not loopback. |
 | `hfTokenFile` | `null` | Hugging Face token file, only for gated repos. |

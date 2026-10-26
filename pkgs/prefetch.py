@@ -192,7 +192,8 @@ def main() -> int:
     quants = sorted(q for q, m in M.MODELS.items() if not m.get("format"))
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--quant", default="Maya-S24", choices=quants)
-    ap.add_argument("--context", type=int, default=32768, choices=M.CONTEXTS)
+    ap.add_argument("--context", type=int, default=32768,
+                    choices=M.CONTEXTS + [524288, 1048576])
     ap.add_argument("--data-dir", required=True)
     ap.add_argument("--gguf-dir", help="a directory holding the quant's shard files already downloaded")
     ap.add_argument("--draft", default="mtp", choices=list(M.DRAFTS))

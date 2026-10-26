@@ -20,7 +20,7 @@ in
     };
 
     context = lib.mkOption {
-      type = lib.types.enum [ 8192 32768 65536 131072 ];
+      type = lib.types.enum [ 8192 32768 65536 131072 524288 1048576 ];
       default = 32768;
       description = "Context window in tokens. The model itself goes to 1 M; RAM is what limits it here.";
     };
